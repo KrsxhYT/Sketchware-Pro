@@ -332,6 +332,10 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        <activity
+    android:name="pro.sketchware.activities.ProjectStatsActivity"
+    android:label="Project Statistics"
+    android:theme="@style/AppTheme" />
     </application>
 
 </manifest>
