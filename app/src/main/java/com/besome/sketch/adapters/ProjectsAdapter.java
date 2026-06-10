@@ -35,6 +35,7 @@ import mod.hey.studios.project.ProjectSettingsDialog;
 import mod.hey.studios.project.backup.BackupRestoreManager;
 import mod.hey.studios.util.Helper;
 import pro.sketchware.R;
+import pro.sketchware.activities.ProjectStatsActivity;
 import pro.sketchware.activities.main.fragments.projects.ProjectsFragment;
 import pro.sketchware.databinding.BottomSheetProjectOptionsBinding;
 import pro.sketchware.databinding.MyprojectsItemBinding;
@@ -51,7 +52,6 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         activity = projectsFragment.requireActivity();
         this.allProjects = allProjects;
         preference = new DB(activity, "project");
-
     }
 
     public void setAllProjects(List<HashMap<String, Object>> projects) {
@@ -169,7 +169,6 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
             holder.binding.imgPin.setVisibility(View.VISIBLE);
         } else {
             holder.binding.imgPin.setVisibility(View.INVISIBLE);
-
         }
 
         String version = " - " + yB.c(projectMap, "sc_ver_name") + " (" + yB.c(projectMap, "sc_ver_code") + ")";
@@ -195,6 +194,11 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         };
 
         holder.binding.expand.setOnClickListener(showProjectSettingsDialog);
+        holder.binding.btnStats.setOnClickListener(v -> {
+            Intent statsIntent = new Intent(activity, ProjectStatsActivity.class);
+            statsIntent.putExtra("project_id", scId);
+            activity.startActivity(statsIntent);
+        });
         holder.binding.imgIcon.setOnClickListener(v -> toProjectSettingOrRequestPermission(projectMap, position));
         holder.binding.getRoot().setOnLongClickListener(v -> {
             showProjectOptionsBottomSheet(projectMap, holder.getAbsoluteAdapterPosition());
