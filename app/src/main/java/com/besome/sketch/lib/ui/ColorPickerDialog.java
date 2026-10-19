@@ -3,6 +3,8 @@ package com.besome.sketch.lib.ui;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -23,8 +25,20 @@ import com.besome.sketch.editor.manage.library.material3.Material3LibraryManager
 import com.besome.sketch.editor.view.ColorGroupItem;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.util.Log;
 
 import a.a.a.DB;
 import a.a.a.GB;
@@ -96,7 +110,10 @@ public class ColorPickerDialog extends PopupWindow {
         dialog.setTitle(R.string.picker_color_title_delete_all_custom_color);
         dialog.setMessage(R.string.picker_color_message_delete_all_custom_color);
         dialog.setPositiveButton(R.string.common_word_delete, (v, which) -> {
-            colorPref.a();
+            if (!persistSavedColors(new ArrayList<>())) {
+                SketchwareUtil.toastError("Could not update the custom colors backup.");
+                return;
+            }
             colorGroups.set(0, getSavedColorBeans());
             notifyChanges();
             v.dismiss();
@@ -221,7 +238,10 @@ public class ColorPickerDialog extends PopupWindow {
             });
             colorGroupItem.tvColorName.setText(colorBean.colorName);
             colorGroupItem.tvColorName.setTextColor(colorBean.displayNameColor);
-            colorGroupItem.tvColorName.setBackgroundColor(colorBean.colorCode);
+            GradientDrawable categoryBackground = new GradientDrawable();
+            categoryBackground.setColor(colorBean.colorCode);
+            categoryBackground.setCornerRadius(activity.getResources().getDisplayMetrics().density * 14);
+            colorGroupItem.tvColorName.setBackground(categoryBackground);
             binding.layoutColorTitle.addView(colorGroupItem);
             if (j == k) {
                 colorGroupItem.imgColorSelector.setImageResource(colorBean.icon);
@@ -442,53 +462,141 @@ public class ColorPickerDialog extends PopupWindow {
     }
 
     private void removeSavedColor(String color) {
-        String savedColors = colorPref.f("P24I1");
-        if (savedColors.contains(color)) {
-            String colorToRemove = color + ",";
-            String colorToSave = savedColors.replaceAll(colorToRemove, "");
-            colorPref.a("P24I1", (Object) colorToSave);
+        ArrayList<String> savedColors = readSavedColors();
+        boolean removed = savedColors.removeIf(savedColor -> savedColor.equalsIgnoreCase(color));
+        if (removed) {
+            if (!persistSavedColors(savedColors)) {
+                SketchwareUtil.toastError("Could not update the custom colors backup.");
+                return;
+            }
             colorGroups.set(0, getSavedColorBeans());
             notifyChanges();
         }
     }
 
     private ColorBean[] getSavedColorBeans() {
-        String savedColors = colorPref.f("P24I1");
-        ColorBean[] colorBeansResult;
-        if (!savedColors.isEmpty()) {
-            String[] colorStrings = savedColors.split(",");
-            ColorBean[] colorBeans = new ColorBean[colorStrings.length];
-            int index = 0;
-            while (index < colorStrings.length) {
+        ArrayList<String> savedColors = readSavedColors();
+        ColorBean[] colorBeans = new ColorBean[savedColors.size()];
+        for (int index = 0; index < savedColors.size(); index++) {
+            String color = savedColors.get(index);
+            int parsedColor = Color.parseColor(color);
+            int lightChannels = 0;
+            if (Color.red(parsedColor) > 240) lightChannels++;
+            if (Color.green(parsedColor) > 240) lightChannels++;
+            if (Color.blue(parsedColor) > 240) lightChannels++;
+
+            colorBeans[index] = new ColorBean(color, "CUSTOM",
+                    lightChannels >= 2 ? "#212121" : "#ffffff",
+                    R.drawable.checked_white_32);
+        }
+        return colorBeans;
+    }
+
+    private File getCustomColorsFile() {
+        return new File(Environment.getExternalStorageDirectory(),
+                ".sketchware/resources/colors/colors.json");
+    }
+
+    /**
+     * Loads the external backup first, while importing existing SharedPreferences colors
+     * for users who are upgrading from an older version.
+     */
+    private ArrayList<String> readSavedColors() {
+        File colorsFile = getCustomColorsFile();
+        if (colorsFile.isFile()) {
+            try {
+                String json = new String(Files.readAllBytes(colorsFile.toPath()), StandardCharsets.UTF_8);
+                JSONArray colors;
                 try {
-                    int parsedColor = Color.parseColor(colorStrings[index]);
-                    int red = Color.red(parsedColor);
-                    int green = Color.green(parsedColor);
-                    int blue = Color.blue(parsedColor);
-
-                    int count = 0;
-                    if (red > 240) count++;
-                    if (green > 240) count++;
-                    if (blue > 240) count++;
-
-
-                    colorBeans[index] = new ColorBean(colorStrings[index], "CUSTOM",
-                            count >= 2 ? "#212121" : "#ffffff",
-                            R.drawable.checked_white_32);
-
-                } catch (Exception e) {
-                    colorPref.a();
-                    colorBeans = new ColorBean[0];
-                    break;
+                    JSONObject backup = new JSONObject(json);
+                    colors = backup.optJSONArray("colors");
+                    if (colors == null) {
+                        throw new JSONException("Custom colors array is missing.");
+                    }
+                } catch (JSONException notAnObject) {
+                    colors = new JSONArray(json);
                 }
-                index++;
+                ArrayList<String> savedColors = new ArrayList<>();
+                for (int i = 0; i < colors.length(); i++) {
+                    String color = colors.optString(i, "");
+                    try {
+                        Color.parseColor(color);
+                        if (!color.isEmpty() && !savedColors.contains(color)) {
+                            savedColors.add(color);
+                        }
+                    } catch (IllegalArgumentException ignored) {
+                        // Ignore malformed entries without discarding the remaining saved colors.
+                    }
+                }
+                colorPref.a("P24I1", (Object) joinColors(savedColors));
+                return savedColors;
+            } catch (IOException | JSONException | IllegalArgumentException e) {
+                Log.w("ColorPickerDialog", "Could not read custom colors backup; using saved preferences.", e);
             }
-            colorBeansResult = colorBeans;
-        } else {
-            colorBeansResult = new ColorBean[0];
         }
 
-        return colorBeansResult;
+        ArrayList<String> legacyColors = parseLegacyColors(colorPref.f("P24I1"));
+        if (!legacyColors.isEmpty()) {
+            persistSavedColors(legacyColors);
+        }
+        return legacyColors;
+    }
+
+    private ArrayList<String> parseLegacyColors(String savedColors) {
+        ArrayList<String> colors = new ArrayList<>();
+        if (savedColors == null || savedColors.isEmpty()) {
+            return colors;
+        }
+        for (String color : savedColors.split(",")) {
+            try {
+                Color.parseColor(color);
+                if (!colors.contains(color)) {
+                    colors.add(color);
+                }
+            } catch (IllegalArgumentException ignored) {
+                // Ignore an invalid legacy entry instead of deleting the whole collection.
+            }
+        }
+        return colors;
+    }
+
+    private String joinColors(ArrayList<String> colors) {
+        StringBuilder legacyValue = new StringBuilder();
+        for (String color : colors) {
+            if (legacyValue.length() > 0) {
+                legacyValue.append(',');
+            }
+            legacyValue.append(color);
+        }
+        return legacyValue.toString();
+    }
+
+    private boolean persistSavedColors(ArrayList<String> colors) {
+        File colorsFile = getCustomColorsFile();
+        File parent = colorsFile.getParentFile();
+        File temporaryFile = new File(parent, colorsFile.getName() + ".tmp");
+        try {
+            if (parent == null) {
+                throw new IOException("Could not create the custom colors folder.");
+            }
+            if (!parent.exists() && !parent.mkdirs()) {
+                throw new IOException("Could not create the custom colors folder.");
+            }
+
+            JSONObject backup = new JSONObject();
+            backup.put("colors", new JSONArray(colors));
+            try (FileOutputStream output = new FileOutputStream(temporaryFile)) {
+                output.write(backup.toString(2).getBytes(StandardCharsets.UTF_8));
+                output.getFD().sync();
+            }
+            Files.move(temporaryFile.toPath(), colorsFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            colorPref.a("P24I1", (Object) joinColors(colors));
+            return true;
+        } catch (IOException | JSONException | SecurityException e) {
+            temporaryFile.delete();
+            Log.e("ColorPickerDialog", "Could not save custom colors backup.", e);
+            return false;
+        }
     }
 
     private void smoothScrollToCurrentItem() {
@@ -500,12 +608,15 @@ public class ColorPickerDialog extends PopupWindow {
     }
 
     private void savePickedColor(String color) {
-        String savedColors = colorPref.f("P24I1");
-        if (savedColors.contains(color)) {
+        ArrayList<String> savedColors = readSavedColors();
+        if (savedColors.stream().anyMatch(savedColor -> savedColor.equalsIgnoreCase(color))) {
             bB.b(activity, activity.getString(R.string.picker_color_already_exist), 0).show();
         } else {
-            String colorsToSave = color + "," + savedColors;
-            colorPref.a("P24I1", (Object) colorsToSave);
+            savedColors.add(0, color);
+            if (!persistSavedColors(savedColors)) {
+                SketchwareUtil.toastError("The custom color could not be saved to the backup file.");
+                return;
+            }
             colorGroups.set(0, getSavedColorBeans());
             notifyChanges();
             k = 0;
@@ -647,7 +758,10 @@ public class ColorPickerDialog extends PopupWindow {
 
             holder.tvColorCode.setTextColor(((ColorBean[]) colorGroups.get(l))[position].displayNameColor);
             holder.tvColorName.setTextColor(((ColorBean[]) colorGroups.get(l))[position].displayNameColor);
-            holder.layoutColorItem.setBackgroundColor(((ColorBean[]) colorGroups.get(l))[position].colorCode);
+            GradientDrawable colorSwatch = new GradientDrawable();
+            colorSwatch.setColor(((ColorBean[]) colorGroups.get(l))[position].colorCode);
+            colorSwatch.setCornerRadius(activity.getResources().getDisplayMetrics().density * 12);
+            holder.layoutColorItem.setBackground(colorSwatch);
             if (position == m && l == k) {
                 holder.imgSelector.setImageResource(((ColorBean[]) colorGroups.get(l))[position].icon);
                 holder.imgSelector.setVisibility(View.VISIBLE);

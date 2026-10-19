@@ -7,7 +7,9 @@
     android:clickable="true"
     android:focusable="true"
     app:cardBackgroundColor="?attr/colorSurfaceContainer"
-    app:cardCornerRadius="20dp">
+    app:cardCornerRadius="20dp"
+    app:strokeColor="?attr/colorOutlineVariant"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:id="@+id/project_one"
@@ -21,7 +23,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            app:cardBackgroundColor="?attr/colorSurface">
+            app:cardBackgroundColor="?attr/colorPrimaryContainer"
+            app:cardCornerRadius="16dp">
 
             <ImageView
                 android:id="@+id/iv_create_new"
@@ -29,7 +32,7 @@
                 android:layout_height="60dp"
                 android:padding="16dp"
                 android:src="@drawable/ic_mtrl_history"
-                app:tint="?attr/colorPrimary" />
+                app:tint="?attr/colorOnPrimaryContainer" />
         </com.google.android.material.card.MaterialCardView>
 
         <LinearLayout
@@ -51,7 +54,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Get your projects in a couple of clicks"
+                android:text="Choose a .swb backup from any storage folder"
                 android:textAppearance="?attr/textAppearanceBodySmall"
                 android:textColor="?attr/colorOnSurfaceVariant" />
         </LinearLayout>

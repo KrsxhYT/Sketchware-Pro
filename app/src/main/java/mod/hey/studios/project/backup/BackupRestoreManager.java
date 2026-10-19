@@ -3,7 +3,10 @@ package mod.hey.studios.project.backup;
 import pro.sketchware.R;
 
 import android.app.Activity;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.OpenableColumns;
 import android.view.LayoutInflater;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -14,19 +17,20 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import a.a.a.lC;
-import dev.pranav.filepicker.FilePickerCallback;
-import dev.pranav.filepicker.FilePickerDialogFragment;
-import dev.pranav.filepicker.FilePickerOptions;
 import mod.hey.studios.util.Helper;
 import pro.sketchware.R;
 import pro.sketchware.activities.main.fragments.projects.ProjectsFragment;
@@ -133,52 +137,145 @@ public class BackupRestoreManager {
 
     /*** Restore ***/
 
-    public void restore() {
-        FilePickerOptions options = new FilePickerOptions();
-        options.setMultipleSelection(true);
-        options.setExtensions(new String[]{BackupFactory.EXTENSION});
-        options.setTitle("Select backups to restore (" + BackupFactory.EXTENSION + ")");
+    public void restore(List<Uri> selectedUris) {
+        if (selectedUris == null || selectedUris.isEmpty()) {
+            return;
+        }
 
-        FilePickerCallback callback = new FilePickerCallback() {
-            @Override
-            public void onFilesSelected(@NotNull List<? extends File> files) {
-                ExecutorService executor = Executors.newSingleThreadExecutor();
-                executor.execute(() -> {
-                    for (int i = 0; i < files.size(); i++) {
-                        String backupFilePath = files.get(i).getAbsolutePath();
-                        int currentIndex = i;
-                        boolean hasLocalLibs = BackupFactory.zipContainsFile(backupFilePath, "local_libs");
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            List<File> backupFiles = new ArrayList<>();
+            int rejectedFiles = 0;
+            String copyError = null;
+            File restoreCache = new File(act.getCacheDir(), "restore_backups");
 
-                        act.runOnUiThread(() -> {
-                            if (act.isFinishing() || act.isDestroyed()) {
-                                return;
-                            }
-                            if (hasLocalLibs) {
-                                boolean restoringMultipleBackups = files.size() > 1;
-
-                                new MaterialAlertDialogBuilder(act)
-                                        .setTitle(R.string.common_word_warning)
-                                        .setMessage(getRestoreIntegratedLocalLibrariesMessage(restoringMultipleBackups, currentIndex, files.size(),
-                                                FileUtil.getFileNameNoExtension(backupFilePath)))
-                                        .setPositiveButton("Copy", (dialog, which) -> doRestore(backupFilePath, true))
-                                        .setNegativeButton("Don't copy", (dialog, which) -> doRestore(backupFilePath, false))
-                                        .setNeutralButton(R.string.common_word_cancel, null)
-                                        .show();
-                            } else {
-                                doRestore(backupFilePath, false);
-                            }
-                        });
+            if (!restoreCache.exists() && !restoreCache.mkdirs()) {
+                copyError = "Could not prepare temporary storage for the selected backup.";
+            } else {
+                for (Uri uri : selectedUris) {
+                    String displayName = getDisplayName(uri);
+                    if (displayName == null || !displayName.toLowerCase(Locale.ROOT).endsWith("." + BackupFactory.EXTENSION)) {
+                        rejectedFiles++;
+                        continue;
                     }
-                    executor.shutdown();
-                });
-            }
-        };
 
-        new FilePickerDialogFragment(options, callback).show(projectsFragment.getChildFragmentManager(), "file_picker");
+                    File cachedBackup = null;
+                    try {
+                        cachedBackup = File.createTempFile("restore_", "." + BackupFactory.EXTENSION, restoreCache);
+                        copyUriToFile(uri, cachedBackup);
+                        backupFiles.add(cachedBackup);
+                    } catch (IOException | SecurityException e) {
+                        if (cachedBackup != null) {
+                            cachedBackup.delete();
+                        }
+                        copyError = e.getMessage();
+                        break;
+                    }
+                }
+            }
+
+            final int skippedFiles = rejectedFiles;
+            final String errorMessage = copyError;
+            act.runOnUiThread(() -> {
+                if (act.isFinishing() || act.isDestroyed()) {
+                    backupFiles.forEach(File::delete);
+                    return;
+                }
+                if (skippedFiles > 0) {
+                    Toast.makeText(act, "Only ." + BackupFactory.EXTENSION + " backup files can be restored.", Toast.LENGTH_LONG).show();
+                }
+                if (errorMessage != null) {
+                    Toast.makeText(act, "Could not read the selected backup: " + errorMessage, Toast.LENGTH_LONG).show();
+                }
+                if (backupFiles.isEmpty()) {
+                    return;
+                }
+                restoreSelectedBackups(backupFiles);
+            });
+        });
+        executor.shutdown();
+    }
+
+    private String getDisplayName(Uri uri) {
+        try (Cursor cursor = act.getContentResolver().query(uri,
+                new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                if (nameIndex >= 0) {
+                    return cursor.getString(nameIndex);
+                }
+            }
+        } catch (Exception ignored) {
+            // Fall back to the URI segment when a document provider does not expose a display name.
+        }
+        return uri.getLastPathSegment();
+    }
+
+    private void copyUriToFile(Uri uri, File destination) throws IOException {
+        try (InputStream input = act.getContentResolver().openInputStream(uri);
+             OutputStream output = new FileOutputStream(destination)) {
+            if (input == null) {
+                throw new IOException("The selected file could not be opened.");
+            }
+            byte[] buffer = new byte[32 * 1024];
+            int length;
+            while ((length = input.read(buffer)) != -1) {
+                output.write(buffer, 0, length);
+            }
+        }
+    }
+
+    private void restoreSelectedBackups(List<File> files) {
+        restoreNextBackup(files, 0);
+    }
+
+    private void restoreNextBackup(List<File> files, int index) {
+        if (index >= files.size()) {
+            files.forEach(File::delete);
+            return;
+        }
+
+        String backupFilePath = files.get(index).getAbsolutePath();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            boolean hasLocalLibs = BackupFactory.zipContainsFile(backupFilePath, "local_libs");
+            act.runOnUiThread(() -> {
+                if (act.isFinishing() || act.isDestroyed()) {
+                    files.forEach(File::delete);
+                    return;
+                }
+                Runnable restoreNext = () -> restoreNextBackup(files, index + 1);
+                if (hasLocalLibs) {
+                    boolean restoringMultipleBackups = files.size() > 1;
+                    new MaterialAlertDialogBuilder(act)
+                            .setTitle(R.string.common_word_warning)
+                            .setMessage(getRestoreIntegratedLocalLibrariesMessage(restoringMultipleBackups, index, files.size(),
+                                    FileUtil.getFileNameNoExtension(backupFilePath)))
+                            .setPositiveButton("Copy", (dialog, which) -> doRestore(backupFilePath, true, restoreNext))
+                            .setNegativeButton("Don't copy", (dialog, which) -> doRestore(backupFilePath, false, restoreNext))
+                            .setNeutralButton(R.string.common_word_cancel, (dialog, which) -> deletePendingBackups(files, index))
+                            .setCancelable(false)
+                            .show();
+                } else {
+                    doRestore(backupFilePath, false, restoreNext);
+                }
+            });
+            executor.shutdown();
+        });
+    }
+
+    private void deletePendingBackups(List<File> files, int startIndex) {
+        for (int i = startIndex; i < files.size(); i++) {
+            files.get(i).delete();
+        }
     }
 
     public void doRestore(String file, boolean restoreLocalLibs) {
-        new RestoreAsyncTask(new WeakReference<>(act), file, restoreLocalLibs, projectsFragment).execute("");
+        doRestore(file, restoreLocalLibs, null);
+    }
+
+    private void doRestore(String file, boolean restoreLocalLibs, Runnable onComplete) {
+        new RestoreAsyncTask(new WeakReference<>(act), file, restoreLocalLibs, projectsFragment, onComplete).execute("");
     }
 
     private static class BackupAsyncTask extends AsyncTask<String, Integer, String> {
@@ -238,15 +335,18 @@ public class BackupRestoreManager {
         private final String file;
         private final ProjectsFragment projectsFragment;
         private final boolean restoreLocalLibs;
+        private final Runnable onComplete;
         private BackupFactory bm;
         private AlertDialog dlg;
         private boolean error = false;
 
-        RestoreAsyncTask(WeakReference<Activity> activityWeakReference, String file, boolean restoreLocalLibraries, ProjectsFragment projectsFragment) {
+        RestoreAsyncTask(WeakReference<Activity> activityWeakReference, String file, boolean restoreLocalLibraries,
+                         ProjectsFragment projectsFragment, Runnable onComplete) {
             this.activityWeakReference = activityWeakReference;
             this.file = file;
             this.projectsFragment = projectsFragment;
             restoreLocalLibs = restoreLocalLibraries;
+            this.onComplete = onComplete;
         }
 
         @Override
@@ -278,7 +378,18 @@ public class BackupRestoreManager {
 
         @Override
         protected void onPostExecute(String _result) {
-            dlg.dismiss();
+            if (dlg != null && dlg.isShowing()) {
+                dlg.dismiss();
+            }
+            Activity activity = activityWeakReference.get();
+            if (activity == null) {
+                return;
+            }
+            File backupFile = new File(file);
+            File restoreCache = new File(activity.getCacheDir(), "restore_backups");
+            if (restoreCache.equals(backupFile.getParentFile())) {
+                backupFile.delete();
+            }
 
             if (!bm.isRestoreSuccess() || error) {
                 SketchwareUtil.toastError("Couldn't restore: " + bm.error, Toast.LENGTH_LONG);
@@ -287,6 +398,9 @@ public class BackupRestoreManager {
                 SketchwareUtil.toast("Restored successfully");
             } else {
                 SketchwareUtil.toast("Restored successfully. Refresh to see the project", Toast.LENGTH_LONG);
+            }
+            if (onComplete != null) {
+                onComplete.run();
             }
         }
     }

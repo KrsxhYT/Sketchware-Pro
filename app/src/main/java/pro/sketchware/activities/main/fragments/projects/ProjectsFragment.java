@@ -58,6 +58,12 @@ public class ProjectsFragment extends DA {
     private final List<HashMap<String, Object>> projectsList = new ArrayList<>();
     private MyprojectsBinding binding;
     private ProjectsAdapter projectsAdapter;
+    private final ActivityResultLauncher<String[]> selectRestoreBackups =
+            registerForActivityResult(new ActivityResultContracts.OpenMultipleDocuments(), files -> {
+                if (files != null && !files.isEmpty() && isAdded()) {
+                    new BackupRestoreManager(requireActivity(), this).restore(files);
+                }
+            });
     public final ActivityResultLauncher<Intent> openProjectSettings = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == Activity.RESULT_OK) {
             Intent data = result.getData();
@@ -125,7 +131,7 @@ public class ProjectsFragment extends DA {
     }
 
     public void restoreProject() {
-        new BackupRestoreManager(getActivity(), this).restore();
+        selectRestoreBackups.launch(new String[]{"*/*"});
     }
 
     @Override
