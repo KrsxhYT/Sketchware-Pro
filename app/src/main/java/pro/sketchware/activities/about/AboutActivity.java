@@ -54,12 +54,20 @@ public class AboutActivity extends BaseAppCompatActivity {
 
     private void initViews() {
         binding.toolbar.setNavigationOnClickListener(Helper.getBackPressedClickListener(this));
+
+        // Discord button
         binding.discordButton.setOnClickListener(v -> {
             String discordLink = aboutAppData.getDiscordInviteLink().getValue();
             if (discordLink != null) {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(discordLink)));
             }
         });
+
+        // Krsxh Telegram Channel button
+        binding.telegramButton.setOnClickListener(v -> {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/KrsxhYT")));
+        });
+
         AboutAdapter adapter = new AboutAdapter(this);
         binding.viewPager.setOffscreenPageLimit(3);
         binding.viewPager.setAdapter(adapter);
@@ -77,8 +85,10 @@ public class AboutActivity extends BaseAppCompatActivity {
             public void onPageSelected(int position) {
                 if (position == 0) {
                     binding.discordButton.extend();
+                    binding.telegramButton.extend();
                 } else {
                     binding.discordButton.shrink();
+                    binding.telegramButton.shrink();
                 }
             }
         });
