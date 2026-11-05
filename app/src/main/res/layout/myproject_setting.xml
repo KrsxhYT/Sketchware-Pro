@@ -18,8 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:navigationIcon="?attr/homeAsUpIndicator"
-            app:title="New project"
-            app:titleTextAppearance="?attr/textAppearanceTitleLarge" />
+            app:title="@string/myprojects_list_menu_title_create_a_new_project" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
@@ -78,74 +77,52 @@
                     android:textSize="13sp" />
             </LinearLayout>
 
-            <!-- Input Fields Card -->
-            <com.google.android.material.card.MaterialCardView
+            <!-- Input Fields -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_app_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="14dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="0dp">
+                android:layout_marginBottom="12dp"
+                app:startIconDrawable="@drawable/ic_mtrl_android">
 
-                <LinearLayout
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_app_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:imeOptions="actionNext"
+                    android:inputType="text" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/til_app_name"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="App name"
-                        app:startIconDrawable="@drawable/ic_mtrl_android">
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_package_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:placeholderText="com.my.newproject"
+                app:startIconDrawable="@drawable/ic_mtrl_package">
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_app_name"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:imeOptions="actionNext"
-                            android:inputType="text" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_package_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:imeOptions="actionNext"
+                    android:inputType="text" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/til_package_name"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:hint="Package name"
-                        app:placeholderText="com.my.newproject"
-                        app:startIconDrawable="@drawable/ic_mtrl_package">
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_project_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:startIconDrawable="@drawable/ic_mtrl_interests">
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_package_name"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:imeOptions="actionNext"
-                            android:inputType="text" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/til_project_name"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:hint="Project name"
-                        app:startIconDrawable="@drawable/ic_mtrl_interests">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_project_name"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:imeOptions="actionDone"
-                            android:inputType="text" />
-                    </com.google.android.material.textfield.TextInputLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_project_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:imeOptions="actionDone"
+                    android:inputType="text" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Theme Colors -->
             <com.google.android.material.card.MaterialCardView
@@ -153,7 +130,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="14dp"
                 app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-                app:cardCornerRadius="18dp"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="0dp">
 
@@ -214,7 +191,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="14dp"
                 app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-                app:cardCornerRadius="18dp"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="0dp">
 
@@ -247,17 +224,18 @@
 
                         <Button
                             android:id="@+id/btn_generate_random_theme"
-                            style="@style/Widget.Material3.Button.TonalButton"
+                            style="@style/Widget.Material3Expressive.Button.ElevatedButton"
                             android:layout_width="wrap_content"
-                            android:layout_height="36dp"
+                            android:layout_height="wrap_content"
                             android:text="@string/theme_generate_random"
                             android:textSize="12sp" />
 
                         <Button
                             android:id="@+id/btnReset"
-                            style="@style/Widget.Material3.Button.IconButton.Tonal"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
+                            style="@style/Widget.Material3Expressive.Button.IconButton.Tonal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="8dp"
                             app:icon="@drawable/ic_mtrl_reset" />
                     </LinearLayout>
 
@@ -283,7 +261,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
                 app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-                app:cardCornerRadius="18dp"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="0dp">
 
@@ -371,21 +349,19 @@
 
         <Button
             android:id="@+id/cancel"
-            style="@style/Widget.Material3.Button.TonalButton"
+            style="@style/Widget.Material3Expressive.Button.TonalButton"
             android:layout_width="0dp"
-            android:layout_height="52dp"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
             android:layout_weight="1"
             android:text="@string/common_word_cancel" />
 
         <Button
             android:id="@+id/ok_button"
-            style="@style/Widget.Material3.Button"
+            style="@style/Widget.Material3Expressive.Button"
             android:layout_width="0dp"
-            android:layout_height="52dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/common_word_create"
-            android:textColor="#FFFFFF"
-            app:backgroundTint="#22C55E" />
+            android:text="@string/common_word_create" />
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
