@@ -2,12 +2,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout_item"
-    style="?attr/materialCardViewElevatedStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
-    app:cardBackgroundColor="?attr/colorSurfaceContainer"
-    app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium">
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="5dp"
+    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,35 +17,36 @@
         android:background="?selectableItemBackground"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingVertical="10dp">
+        android:paddingVertical="10dp"
+        android:paddingEnd="8dp">
 
         <CheckBox
             android:id="@+id/chk_select"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:contentDescription="@null" />
 
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="8dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="16dp">
+            android:layout_marginVertical="6dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="12dp">
 
             <ImageView
                 android:id="@+id/img_album"
                 android:layout_width="40dp"
-                tools:src="@drawable/abc_96_color"
                 android:layout_height="40dp"
-                android:scaleType="centerCrop" />
+                android:scaleType="centerCrop"
+                tools:src="@drawable/abc_96_color" />
 
             <LinearLayout
                 android:id="@+id/delete_img_container"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_centerInParent="true"
-                android:layout_centerHorizontal="true"
-                android:alpha="0.8"
+                android:alpha="0.85"
                 android:background="@drawable/circle_bg_dark_grey_alpha"
                 android:gravity="center"
                 android:visibility="gone">
@@ -74,7 +77,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="2dp"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
                     tools:text="Sound Name" />
 
                 <LinearLayout
@@ -87,9 +92,8 @@
                         android:id="@+id/tv_currenttime"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginRight="5dp"
-                        android:paddingRight="5dp"
-                        android:textColor="#ff9a9a9a"
+                        android:layout_marginEnd="5dp"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="12sp"
                         tools:text="00:00" />
 
@@ -108,9 +112,8 @@
                         android:id="@+id/tv_endtime"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:paddingLeft="5dp"
-                        android:textColor="#ff9a9a9a"
+                        android:layout_marginStart="5dp"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="12sp"
                         tools:text="00:00" />
                 </LinearLayout>
@@ -120,7 +123,7 @@
                 android:id="@+id/img_play"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginRight="8dp"
+                android:layout_marginEnd="4dp"
                 android:padding="4dp"
                 app:tint="?attr/colorPrimary"
                 tools:src="@drawable/ic_mtrl_circle_play" />
