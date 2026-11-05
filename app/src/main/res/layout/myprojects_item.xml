@@ -89,7 +89,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="5dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -117,7 +117,7 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- 3-dot menu -->
+        <!-- Menu -->
         <ImageView
             android:id="@+id/expand"
             android:layout_width="36dp"
