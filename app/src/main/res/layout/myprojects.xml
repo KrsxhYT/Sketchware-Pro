@@ -15,19 +15,21 @@
             android:id="@+id/nested_scroll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fadingEdgeLength="30dp"
+            android:fadingEdgeLength="40dp"
             android:fillViewport="true"
             android:requiresFadingEdge="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingTop="4dp">
 
                 <FrameLayout
                     android:id="@+id/special_action_container"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp">
 
                     <include
                         android:id="@+id/special_action"
@@ -39,14 +41,15 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
+                    <!-- Soft Minimalist Section Header -->
                     <LinearLayout
                         android:id="@+id/title_container"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="6dp"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="12dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
@@ -55,16 +58,19 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="@string/common_word_projects"
-                            android:textAppearance="?attr/textAppearanceTitleLargeEmphasized" />
+                            android:textAppearance="?attr/textAppearanceTitleLargeEmphasized"
+                            android:letterSpacing="-0.01" />
 
                         <ImageView
                             android:id="@+id/icon_sort"
-                            android:layout_width="@dimen/mtrl_min_touch_target_size"
-                            android:layout_height="@dimen/mtrl_min_touch_target_size"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
                             android:contentDescription="@string/sort_projects"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:scaleType="centerInside"
-                            app:srcCompat="@drawable/ic_mtrl_sort" />
+                            android:padding="8dp"
+                            app:srcCompat="@drawable/ic_mtrl_sort"
+                            app:tint="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
 
                     <FrameLayout
@@ -79,9 +85,9 @@
                             android:layout_gravity="center"
                             android:layout_marginBottom="80dp"
                             android:indeterminate="true"
-                            app:indicatorSize="64dp"
-                            app:waveAmplitude="2dp"
-                            app:wavelength="20dp" />
+                            app:indicatorSize="56dp"
+                            app:waveAmplitude="1.5dp"
+                            app:wavelength="18dp" />
                     </FrameLayout>
 
                     <androidx.recyclerview.widget.RecyclerView
@@ -90,7 +96,8 @@
                         android:layout_height="match_parent"
                         android:clipToPadding="false"
                         android:nestedScrollingEnabled="true"
-                        android:paddingBottom="96dp"
+                        android:paddingBottom="110dp"
+                        android:paddingTop="2dp"
                         android:splitMotionEvents="false"
                         android:transitionGroup="true"
                         android:visibility="gone"
