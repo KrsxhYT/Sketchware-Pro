@@ -26,7 +26,7 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:clipToPadding="false"
-        android:paddingBottom="80dp">
+        android:paddingBottom="90dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -39,15 +39,15 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="12dp"
                 android:layout_marginBottom="20dp"
                 android:gravity="center"
                 android:orientation="vertical">
 
                 <com.google.android.material.card.MaterialCardView
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    app:cardCornerRadius="20dp"
+                    android:layout_width="76dp"
+                    android:layout_height="76dp"
+                    app:cardCornerRadius="22dp"
                     app:cardElevation="0dp"
                     app:strokeWidth="0dp">
 
@@ -337,7 +337,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom Buttons -->
+    <!-- Bottom Buttons - Soft Minimalist -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -351,7 +351,7 @@
             android:id="@+id/cancel"
             style="@style/Widget.Material3Expressive.Button.TonalButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="52dp"
             android:layout_marginEnd="10dp"
             android:layout_weight="1"
             android:text="@string/common_word_cancel" />
@@ -360,8 +360,10 @@
             android:id="@+id/ok_button"
             style="@style/Widget.Material3Expressive.Button"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="52dp"
             android:layout_weight="1"
-            android:text="@string/common_word_create" />
+            android:text="@string/common_word_create"
+            android:textColor="#FFFFFF"
+            app:backgroundTint="#22C55E" />
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
