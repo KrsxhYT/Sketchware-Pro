@@ -5,22 +5,22 @@
     android:layout_height="wrap_content">
 
     <com.google.android.material.card.MaterialCardView
-        style="?attr/materialCardViewFilledStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        app:cardBackgroundColor="?attr/colorSurfaceContainer">
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="6dp"
+        app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+        app:cardCornerRadius="14dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp">
 
         <CheckBox
             android:id="@+id/checkbox_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginVertical="10dp"
+            android:layout_marginEnd="14dp"
+            android:layout_marginStart="10dp"
             android:paddingStart="8dp"
             android:textAppearance="?attr/textAppearanceBodyMedium"
             tools:text="android.permission.WRITE_EXTERNAL_STORAGE" />
