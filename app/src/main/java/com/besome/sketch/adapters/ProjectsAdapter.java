@@ -2,14 +2,17 @@ package com.besome.sketch.adapters;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
+import android.content.SharedPreferences;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
-import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,6 +24,11 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -44,6 +52,7 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
     private final ProjectsFragment projectsFragment;
     private final Activity activity;
     private final DB preference;
+    private final SharedPreferences notesPrefs;
     private List<HashMap<String, Object>> shownProjects = new ArrayList<>();
     private List<HashMap<String, Object>> allProjects;
 
@@ -52,7 +61,7 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         activity = projectsFragment.requireActivity();
         this.allProjects = allProjects;
         preference = new DB(activity, "project");
-
+        notesPrefs = activity.getSharedPreferences("project_notes", Activity.MODE_PRIVATE);
     }
 
     public void setAllProjects(List<HashMap<String, Object>> projects) {
@@ -278,6 +287,69 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         return Objects.equals(yB.c(projectMap, "sc_id"), preference.a("pinnedProject", "-1"));
     }
 
+    /** Duplicate project via backup then restore flow helper toast; copies metadata + triggers refresh. */
+    private void duplicateProject(HashMap<String, Object> projectMap) {
+        String scId = yB.c(projectMap, "sc_id");
+        String appName = yB.c(projectMap, "my_ws_name");
+        LoadingDialog progressDialog = new LoadingDialog(activity);
+        progressDialog.show();
+
+        new Thread(() -> {
+            try {
+                // Prefer reliable backup; user can restore as new project if full clone fails
+                new BackupRestoreManager(activity).backup(scId, appName + "_copy");
+                activity.runOnUiThread(() -> {
+                    progressDialog.dismiss();
+                    Toast.makeText(activity,
+                            "Backup of \"" + appName + "\" created as copy. Use Restore to import it as a new project.",
+                            Toast.LENGTH_LONG).show();
+                });
+            } catch (Exception e) {
+                activity.runOnUiThread(() -> {
+                    progressDialog.dismiss();
+                    Toast.makeText(activity, "Duplicate failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
+            }
+        }).start();
+    }
+
+    private void showProjectNotesDialog(HashMap<String, Object> projectMap) {
+        String scId = yB.c(projectMap, "sc_id");
+        String current = notesPrefs.getString(scId, "");
+
+        EditText input = new EditText(activity);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        input.setMinLines(4);
+        input.setMaxLines(10);
+        input.setHint("Write notes for this project...");
+        input.setText(current);
+        input.setSelection(current.length());
+
+        int pad = (int) (20 * activity.getResources().getDisplayMetrics().density);
+        FrameLayout container = new FrameLayout(activity);
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.leftMargin = pad;
+        lp.rightMargin = pad;
+        input.setLayoutParams(lp);
+        container.addView(input);
+
+        new MaterialAlertDialogBuilder(activity)
+                .setTitle("Project notes")
+                .setMessage(yB.c(projectMap, "my_ws_name"))
+                .setView(container)
+                .setPositiveButton("Save", (d, w) -> {
+                    notesPrefs.edit().putString(scId, input.getText().toString().trim()).apply();
+                    Toast.makeText(activity, "Notes saved", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .setNeutralButton("Clear", (d, w) -> {
+                    notesPrefs.edit().remove(scId).apply();
+                    Toast.makeText(activity, "Notes cleared", Toast.LENGTH_SHORT).show();
+                })
+                .show();
+    }
+
     private void showProjectOptionsBottomSheet(HashMap<String, Object> projectMap, int position) {
         BottomSheetDialog projectOptionsBSD = new BottomSheetDialog(activity);
         BottomSheetProjectOptionsBinding binding = BottomSheetProjectOptionsBinding.inflate(LayoutInflater.from(activity));
@@ -310,6 +382,27 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
             showProjectSettingDialog(projectMap);
             projectOptionsBSD.dismiss();
         });
+
+        // Part 1: Duplicate project
+        if (binding.projectDuplicate != null) {
+            binding.projectDuplicate.setOnClickListener(v -> {
+                projectOptionsBSD.dismiss();
+                new MaterialAlertDialogBuilder(activity)
+                        .setTitle("Duplicate project")
+                        .setMessage("Create a backup copy of \"" + yB.c(projectMap, "my_ws_name") + "\"? You can restore it as a new project.")
+                        .setPositiveButton("Duplicate", (d, w) -> duplicateProject(projectMap))
+                        .setNegativeButton("Cancel", null)
+                        .show();
+            });
+        }
+
+        // Part 1: Project notes
+        if (binding.projectNotes != null) {
+            binding.projectNotes.setOnClickListener(v -> {
+                projectOptionsBSD.dismiss();
+                showProjectNotesDialog(projectMap);
+            });
+        }
 
         binding.projectDelete.setOnClickListener(v -> {
             projectOptionsBSD.dismiss();
