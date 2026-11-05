@@ -27,6 +27,7 @@ public class ProgramInfoActivity extends BaseAppCompatActivity {
     private static final int ITEM_SOCIAL_NETWORK = 5;
     private static final int ITEM_DISCORD = 6;
     private static final int ITEM_TELEGRAM = 8;
+    private static final int ITEM_KRSXH_TELEGRAM = 9;
     private static final int ITEM_OPEN_SOURCE_LICENSES = 15;
     private static final int ITEM_SUGGEST_IDEAS = 17;
 
@@ -125,6 +126,7 @@ public class ProgramInfoActivity extends BaseAppCompatActivity {
                     case ITEM_TELEGRAM ->
                             openUrl(Helper.getResString(R.string.link_telegram_invite));
                     case ITEM_DISCORD -> openUrl(Helper.getResString(R.string.link_discord_invite));
+                    case ITEM_KRSXH_TELEGRAM -> openUrl("https://t.me/KrsxhYT");
                 }
             }
         }
@@ -150,6 +152,7 @@ public class ProgramInfoActivity extends BaseAppCompatActivity {
         addSingleLineItem(ITEM_SOCIAL_NETWORK, R.string.title_community);
         addTwoLineItem(ITEM_DISCORD, R.string.title_discord_community, R.string.link_discord_invite);
         addTwoLineItem(ITEM_TELEGRAM, R.string.title_telegram_community, R.string.link_telegram_invite);
+        addTwoLineItem(ITEM_KRSXH_TELEGRAM, "KrsxhYT Telegram", "https://t.me/KrsxhYT");
         addSingleLineItem(ITEM_SYSTEM_INFORMATION, R.string.program_information_title_system_information);
         addSingleLineItem(ITEM_OPEN_SOURCE_LICENSES, R.string.program_information_title_open_source_license, true);
     }
