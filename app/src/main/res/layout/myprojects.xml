@@ -23,13 +23,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:paddingTop="4dp">
+                android:paddingTop="6dp">
 
                 <FrameLayout
                     android:id="@+id/special_action_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp">
+                    android:layout_marginBottom="2dp">
 
                     <include
                         android:id="@+id/special_action"
@@ -41,13 +41,13 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
-                    <!-- Soft Minimalist Section Header -->
+                    <!-- Soft Minimalist Header -->
                     <LinearLayout
                         android:id="@+id/title_container"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="12dp"
                         android:gravity="center_vertical"
@@ -57,9 +57,10 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="@string/common_word_projects"
+                            android:text="My projects"
                             android:textAppearance="?attr/textAppearanceTitleLargeEmphasized"
-                            android:letterSpacing="-0.01" />
+                            android:textSize="22sp"
+                            android:letterSpacing="-0.02" />
 
                         <ImageView
                             android:id="@+id/icon_sort"
@@ -85,7 +86,7 @@
                             android:layout_gravity="center"
                             android:layout_marginBottom="80dp"
                             android:indeterminate="true"
-                            app:indicatorSize="56dp"
+                            app:indicatorSize="52dp"
                             app:waveAmplitude="1.5dp"
                             app:wavelength="18dp" />
                     </FrameLayout>
@@ -96,7 +97,7 @@
                         android:layout_height="match_parent"
                         android:clipToPadding="false"
                         android:nestedScrollingEnabled="true"
-                        android:paddingBottom="110dp"
+                        android:paddingBottom="120dp"
                         android:paddingTop="2dp"
                         android:splitMotionEvents="false"
                         android:transitionGroup="true"
