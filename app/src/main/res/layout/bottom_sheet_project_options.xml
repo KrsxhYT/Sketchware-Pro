@@ -118,7 +118,7 @@
                         <ImageView
                             android:layout_width="22dp"
                             android:layout_height="22dp"
-                            app:srcCompat="@drawable/ic_mtrl_copy"
+                            app:srcCompat="@drawable/ic_mtrl_add"
                             app:tint="?attr/colorOnSurface" />
 
                         <TextView
@@ -156,7 +156,7 @@
                         <ImageView
                             android:layout_width="22dp"
                             android:layout_height="22dp"
-                            app:srcCompat="@drawable/ic_mtrl_edit"
+                            app:srcCompat="@drawable/ic_mtrl_interests"
                             app:tint="?attr/colorOnSurface" />
 
                         <TextView
