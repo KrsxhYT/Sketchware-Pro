@@ -53,7 +53,7 @@ import mod.hey.studios.util.Helper;
 import pro.sketchware.R;
 import pro.sketchware.widgets.IconCustomWidget;
 
-public class PaletteWidget extends extends LinearLayout {
+public class PaletteWidget extends LinearLayout {
 
     public MaterialCardView cardView;
     private LinearLayout layoutContainer;
@@ -165,7 +165,7 @@ public class PaletteWidget extends extends LinearLayout {
         scrollView = findViewById(R.id.scv);
         cardView = findViewById(R.id.cardView);
 
-        // Part 1: Widget search filter
+        // Widget search filter
         searchEditText = findViewById(R.id.et_widget_search);
         if (searchEditText != null) {
             searchEditText.addTextChangedListener(new TextWatcher() {
@@ -185,10 +185,6 @@ public class PaletteWidget extends extends LinearLayout {
         }
     }
 
-    /**
-     * Filter layout and widget items by search query (case-insensitive).
-     * Matches against view text content / content description.
-     */
     private void filterWidgets(String query) {
         String q = query.trim().toLowerCase();
         filterContainer(layoutContainer, q);
@@ -219,7 +215,6 @@ public class PaletteWidget extends extends LinearLayout {
             return t != null ? t.toString() : "";
         }
         if (view instanceof IconBase) {
-            // IconBase typically exposes text via getText or child TextView
             try {
                 Object text = view.getClass().getMethod("getText").invoke(view);
                 if (text != null) return text.toString();
