@@ -3,6 +3,8 @@ package com.besome.sketch.editor.view.palette;
 import static pro.sketchware.utility.SketchwareUtil.dpToPx;
 
 import android.content.Context;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 import com.besome.sketch.lib.ui.CustomScrollView;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.color.MaterialColors;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.HashMap;
 
@@ -50,7 +53,7 @@ import mod.hey.studios.util.Helper;
 import pro.sketchware.R;
 import pro.sketchware.widgets.IconCustomWidget;
 
-public class PaletteWidget extends LinearLayout {
+public class PaletteWidget extends extends LinearLayout {
 
     public MaterialCardView cardView;
     private LinearLayout layoutContainer;
@@ -58,6 +61,7 @@ public class PaletteWidget extends LinearLayout {
     private TextView titleLayouts;
     private TextView titleWidgets;
     private CustomScrollView scrollView;
+    private TextInputEditText searchEditText;
 
     public PaletteWidget(Context context) {
         super(context);
@@ -160,6 +164,90 @@ public class PaletteWidget extends LinearLayout {
         titleWidgets.setText(Helper.getResString(R.string.view_panel_title_widgets));
         scrollView = findViewById(R.id.scv);
         cardView = findViewById(R.id.cardView);
+
+        // Part 1: Widget search filter
+        searchEditText = findViewById(R.id.et_widget_search);
+        if (searchEditText != null) {
+            searchEditText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    filterWidgets(s != null ? s.toString() : "");
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                }
+            });
+        }
+    }
+
+    /**
+     * Filter layout and widget items by search query (case-insensitive).
+     * Matches against view text content / content description.
+     */
+    private void filterWidgets(String query) {
+        String q = query.trim().toLowerCase();
+        filterContainer(layoutContainer, q);
+        filterContainer(widgetsContainer, q);
+
+        boolean showLayouts = hasVisibleChild(layoutContainer) || q.isEmpty();
+        boolean showWidgets = hasVisibleChild(widgetsContainer) || q.isEmpty();
+        titleLayouts.setVisibility(showLayouts ? View.VISIBLE : View.GONE);
+        titleWidgets.setVisibility(showWidgets ? View.VISIBLE : View.GONE);
+    }
+
+    private void filterContainer(ViewGroup container, String query) {
+        if (container == null) return;
+        for (int i = 0; i < container.getChildCount(); i++) {
+            View child = container.getChildAt(i);
+            if (query.isEmpty()) {
+                child.setVisibility(View.VISIBLE);
+                continue;
+            }
+            String label = extractLabel(child);
+            child.setVisibility(label.toLowerCase().contains(query) ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    private String extractLabel(View view) {
+        if (view instanceof TextView) {
+            CharSequence t = ((TextView) view).getText();
+            return t != null ? t.toString() : "";
+        }
+        if (view instanceof IconBase) {
+            // IconBase typically exposes text via getText or child TextView
+            try {
+                Object text = view.getClass().getMethod("getText").invoke(view);
+                if (text != null) return text.toString();
+            } catch (Exception ignored) {
+            }
+        }
+        if (view instanceof ViewGroup) {
+            ViewGroup vg = (ViewGroup) view;
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < vg.getChildCount(); i++) {
+                View c = vg.getChildAt(i);
+                if (c instanceof TextView) {
+                    CharSequence t = ((TextView) c).getText();
+                    if (t != null) sb.append(t).append(' ');
+                }
+            }
+            if (sb.length() > 0) return sb.toString().trim();
+        }
+        CharSequence cd = view.getContentDescription();
+        return cd != null ? cd.toString() : "";
+    }
+
+    private boolean hasVisibleChild(ViewGroup container) {
+        if (container == null) return false;
+        for (int i = 0; i < container.getChildCount(); i++) {
+            if (container.getChildAt(i).getVisibility() == View.VISIBLE) return true;
+        }
+        return false;
     }
 
     public void removeWidgets() {
