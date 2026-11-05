@@ -19,7 +19,9 @@
             <com.google.android.material.appbar.AppBarLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fitsSystemWindows="true">
+                android:fitsSystemWindows="true"
+                android:background="?android:colorBackground"
+                app:elevation="0dp">
 
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/toolbar"
@@ -40,7 +42,8 @@
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:dividerColor="?attr/colorSurfaceContainerHighest" />
+                    app:dividerColor="?attr/colorSurfaceContainerHighest"
+                    app:dividerThickness="0.5dp" />
             </com.google.android.material.appbar.AppBarLayout>
 
             <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -58,7 +61,8 @@
             <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:dividerColor="?attr/colorSurfaceContainerHighest" />
+                app:dividerColor="?attr/colorSurfaceContainerHighest"
+                app:dividerThickness="0.5dp" />
 
             <LinearLayout
                 android:id="@+id/progress_container"
@@ -91,25 +95,30 @@
                     app:trackStopIndicatorSize="0dp" />
             </LinearLayout>
 
+            <!-- Soft Minimalist Bottom Bar -->
             <LinearLayout
                 android:id="@+id/bottom_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/colorSurfaceContainer"
+                android:background="?android:colorBackground"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingVertical="4dp">
+                android:paddingVertical="6dp"
+                android:paddingHorizontal="8dp">
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/file_name_container"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
                     android:clickable="true"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                    app:contentPadding="8dp">
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:contentPadding="8dp"
+                    app:strokeWidth="0dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
