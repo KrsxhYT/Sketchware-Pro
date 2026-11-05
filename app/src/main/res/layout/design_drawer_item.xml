@@ -3,23 +3,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="4dp"
-    android:layout_marginBottom="6dp"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginBottom="4dp"
     android:clickable="true"
     android:focusable="true"
     app:cardBackgroundColor="@android:color/transparent"
+    app:cardElevation="0dp"
+    app:strokeWidth="0dp"
     app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingVertical="4dp">
 
         <ImageView
             android:id="@+id/img_icon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
             android:layout_marginStart="16dp"
             app:tint="?attr/colorOnSurfaceVariant"
             tools:src="@drawable/ic_mtrl_bookmark" />
@@ -27,11 +30,11 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="14dp"
             android:layout_marginEnd="8dp"
             android:gravity="center"
             android:orientation="horizontal"
-            android:paddingVertical="8dp">
+            android:paddingVertical="10dp">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -45,7 +48,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
                     android:textColor="?attr/colorOnSurface"
                     tools:text="@string/design_drawer_menu_title_collection" />
 
@@ -63,8 +66,8 @@
 
             <ImageView
                 android:id="@+id/img_more"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:src="@drawable/ic_mtrl_chevron_right_24"
                 app:tint="?attr/colorOnSurfaceVariant" />
         </LinearLayout>
