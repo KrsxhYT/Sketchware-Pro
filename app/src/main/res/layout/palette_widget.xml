@@ -6,6 +6,40 @@
     android:paddingHorizontal="6dp"
     android:paddingTop="4dp">
 
+    <!-- Widget Search (Part 1 feature) -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_widget_search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Search widgets..."
+            app:boxBackgroundMode="none"
+            app:startIconDrawable="@drawable/ic_mtrl_search"
+            app:endIconMode="clear_text"
+            app:hintEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_widget_search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:imeOptions="actionSearch"
+                android:maxLines="1"
+                android:textSize="13sp"
+                android:paddingVertical="10dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </com.google.android.material.card.MaterialCardView>
+
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardView"
         android:layout_width="match_parent"
