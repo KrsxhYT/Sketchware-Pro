@@ -4,14 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:background="?android:colorBackground"
     tools:ignore="ContentDescription">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorSurface"
+        android:background="?android:colorBackground"
         android:fitsSystemWindows="true"
+        app:elevation="0dp"
         app:liftOnScrollColor="@color/transparent">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -24,7 +26,13 @@
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:dividerThickness="0.5dp" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -39,7 +47,7 @@
             android:id="@+id/view_pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginHorizontal="10dp"
+            android:layout_marginHorizontal="12dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     </LinearLayout>
@@ -49,29 +57,28 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
-        android:layout_margin="16dp"
+        android:layout_margin="20dp"
         android:src="@drawable/ic_mtrl_add"
         app:icon="@drawable/ic_mtrl_add"
         tools:ignore="ContentDescription" />
-
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/layout_btn_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_margin="14dp"
+        android:layout_margin="16dp"
         android:visibility="gone"
         app:cardBackgroundColor="?attr/colorSurfaceContainer"
         app:cardCornerRadius="18dp"
-        app:cardElevation="5dp"
-        app:strokeWidth="0.5dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp"
         tools:visibility="visible">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
+            android:layout_margin="6dp"
             android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
@@ -83,7 +90,7 @@
                 android:layout_weight="1"
                 android:text="@string/cancel"
                 android:textSize="@dimen/text_size_button_material"
-                app:cornerRadius="15dp" />
+                app:cornerRadius="14dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_delete"
@@ -93,7 +100,7 @@
                 android:layout_weight="1"
                 android:text="@string/common_word_delete"
                 android:textSize="@dimen/text_size_button_material"
-                app:cornerRadius="15dp" />
+                app:cornerRadius="14dp" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
