@@ -28,6 +28,7 @@ public class ProgramInfoActivity extends BaseAppCompatActivity {
     private static final int ITEM_DISCORD = 6;
     private static final int ITEM_TELEGRAM = 8;
     private static final int ITEM_KRSXH_TELEGRAM = 9;
+    private static final int ITEM_CHANGELOG = 10;
     private static final int ITEM_OPEN_SOURCE_LICENSES = 15;
     private static final int ITEM_SUGGEST_IDEAS = 17;
 
@@ -73,7 +74,7 @@ public class ProgramInfoActivity extends BaseAppCompatActivity {
         item.setName(name);
         item.setHideDivider(hideDivider);
         binding.content.addView(item);
-        if (key == ITEM_SYSTEM_INFORMATION || key == ITEM_OPEN_SOURCE_LICENSES) {
+        if (key == ITEM_SYSTEM_INFORMATION || key == ITEM_OPEN_SOURCE_LICENSES || key == ITEM_CHANGELOG) {
             item.setOnClickListener(this::handleItem);
         }
     }
@@ -100,6 +101,27 @@ public class ProgramInfoActivity extends BaseAppCompatActivity {
         dialog.show();
     }
 
+    private void showChangelog() {
+        String msg = """
+                Krsxh Sketchware Pro — What’s new
+
+                • Soft Minimalist UI across major screens
+                • Widget search in View palette
+                • Project notes (save / clear)
+                • Duplicate project (backup copy → Restore)
+                • Share project info
+                • Daily tip on homepage
+                • KrsxhYT Telegram in About & App Info
+
+                More features coming in Part 2.
+                """;
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Changelog")
+                .setMessage(msg.trim())
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
     private void handleItem(View v) {
         if (!mB.a()) {
             int key;
@@ -107,6 +129,7 @@ public class ProgramInfoActivity extends BaseAppCompatActivity {
                 key = ((PropertyOneLineItem) v).getKey();
                 switch (key) {
                     case ITEM_SYSTEM_INFORMATION -> toSystemInfoActivity();
+                    case ITEM_CHANGELOG -> showChangelog();
                     case ITEM_OPEN_SOURCE_LICENSES -> {
                         if (!GB.h(getApplicationContext())) {
                             bB.a(getApplicationContext(), Helper.getResString(R.string.common_message_check_network), bB.TOAST_NORMAL).show();
@@ -153,6 +176,7 @@ public class ProgramInfoActivity extends BaseAppCompatActivity {
         addTwoLineItem(ITEM_DISCORD, R.string.title_discord_community, R.string.link_discord_invite);
         addTwoLineItem(ITEM_TELEGRAM, R.string.title_telegram_community, R.string.link_telegram_invite);
         addTwoLineItem(ITEM_KRSXH_TELEGRAM, "KrsxhYT Telegram", "https://t.me/KrsxhYT");
+        addSingleLineItem(ITEM_CHANGELOG, "Changelog");
         addSingleLineItem(ITEM_SYSTEM_INFORMATION, R.string.program_information_title_system_information);
         addSingleLineItem(ITEM_OPEN_SOURCE_LICENSES, R.string.program_information_title_open_source_license, true);
     }
