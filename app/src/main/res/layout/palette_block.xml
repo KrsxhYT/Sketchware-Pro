@@ -5,39 +5,78 @@
     android:background="?attr/colorSurfaceContainer"
     android:orientation="horizontal">
 
-    <com.besome.sketch.lib.ui.CustomScrollView
-        android:id="@+id/scroll"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1">
-        <LinearLayout
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginTop="8dp"
+            app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp">
 
-            <LinearLayout
-                android:id="@+id/actions_container"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_block_search"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="8dp"
-                android:paddingStart="8dp"
-                android:paddingLeft="8dp" />
+                android:hint="Search blocks..."
+                app:boxBackgroundMode="none"
+                app:startIconDrawable="@drawable/ic_mtrl_search"
+                app:endIconMode="clear_text"
+                app:hintEnabled="true">
 
-            <com.besome.sketch.lib.ui.CustomHorizontalScrollView
-                android:id="@+id/scroll_horizontal"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_block_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:imeOptions="actionSearch"
+                    android:maxLines="1"
+                    android:textSize="13sp"
+                    android:paddingVertical="10dp" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.besome.sketch.lib.ui.CustomScrollView
+            android:id="@+id/scroll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
                 <LinearLayout
-                    android:id="@+id/block_builder"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/actions_container"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="8dp" />
-            </com.besome.sketch.lib.ui.CustomHorizontalScrollView>
-        </LinearLayout>
-    </com.besome.sketch.lib.ui.CustomScrollView>
+                    android:paddingTop="8dp"
+                    android:paddingStart="8dp"
+                    android:paddingLeft="8dp" />
+
+                <com.besome.sketch.lib.ui.CustomHorizontalScrollView
+                    android:id="@+id/scroll_horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:id="@+id/block_builder"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="8dp" />
+                </com.besome.sketch.lib.ui.CustomHorizontalScrollView>
+            </LinearLayout>
+        </com.besome.sketch.lib.ui.CustomScrollView>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="120dp"
