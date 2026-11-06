@@ -105,15 +105,17 @@ public class ProgramInfoActivity extends BaseAppCompatActivity {
         String msg = """
                 Krsxh Sketchware Pro — What’s new
 
+                Part 1
                 • Soft Minimalist UI across major screens
                 • Widget search in View palette
-                • Project notes (save / clear)
-                • Duplicate project (backup copy → Restore)
-                • Share project info
-                • Daily tip on homepage
-                • KrsxhYT Telegram in About & App Info
+                • Project notes / duplicate / share
+                • Daily tip + Changelog
+                • KrsxhYT Telegram links
 
-                More features coming in Part 2.
+                Part 2
+                • Live block search in Logic palette
+                • Category search header → search dialog
+                • Polished category search UI
                 """;
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Changelog")
