@@ -24,11 +24,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -192,7 +187,6 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
             holder.binding.imgPin.setVisibility(View.VISIBLE);
         } else {
             holder.binding.imgPin.setVisibility(View.INVISIBLE);
-
         }
 
         String version = " - " + yB.c(projectMap, "sc_ver_name") + " (" + yB.c(projectMap, "sc_ver_code") + ")";
@@ -287,7 +281,6 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         return Objects.equals(yB.c(projectMap, "sc_id"), preference.a("pinnedProject", "-1"));
     }
 
-    /** Duplicate project via backup then restore flow helper toast; copies metadata + triggers refresh. */
     private void duplicateProject(HashMap<String, Object> projectMap) {
         String scId = yB.c(projectMap, "sc_id");
         String appName = yB.c(projectMap, "my_ws_name");
@@ -296,12 +289,11 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
 
         new Thread(() -> {
             try {
-                // Prefer reliable backup; user can restore as new project if full clone fails
                 new BackupRestoreManager(activity).backup(scId, appName + "_copy");
                 activity.runOnUiThread(() -> {
                     progressDialog.dismiss();
                     Toast.makeText(activity,
-                            "Backup of \"" + appName + "\" created as copy. Use Restore to import it as a new project.",
+                            "Copy of \"" + appName + "\" saved. Use Restore at the top to import it as a new project.",
                             Toast.LENGTH_LONG).show();
                 });
             } catch (Exception e) {
@@ -311,6 +303,33 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
                 });
             }
         }).start();
+    }
+
+    private void shareProjectInfo(HashMap<String, Object> projectMap) {
+        String name = yB.c(projectMap, "my_ws_name");
+        String appName = yB.c(projectMap, "my_app_name");
+        String pkg = yB.c(projectMap, "my_sc_pkg_name");
+        String ver = yB.c(projectMap, "sc_ver_name") + " (" + yB.c(projectMap, "sc_ver_code") + ")";
+        String scId = yB.c(projectMap, "sc_id");
+        String notes = notesPrefs.getString(scId, "");
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Project: ").append(name).append('\n');
+        sb.append("App name: ").append(appName).append('\n');
+        sb.append("Package: ").append(pkg).append('\n');
+        sb.append("Version: ").append(ver).append('\n');
+        sb.append("ID: ").append(scId).append('\n');
+        if (notes != null && !notes.isEmpty()) {
+            sb.append("Notes: ").append(notes).append('\n');
+        }
+        sb.append("\nMade with Krsxh Sketchware Pro\n");
+        sb.append("https://t.me/KrsxhYT");
+
+        Intent send = new Intent(Intent.ACTION_SEND);
+        send.setType("text/plain");
+        send.putExtra(Intent.EXTRA_SUBJECT, name);
+        send.putExtra(Intent.EXTRA_TEXT, sb.toString());
+        activity.startActivity(Intent.createChooser(send, "Share project info"));
     }
 
     private void showProjectNotesDialog(HashMap<String, Object> projectMap) {
@@ -383,24 +402,29 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
             projectOptionsBSD.dismiss();
         });
 
-        // Part 1: Duplicate project
         if (binding.projectDuplicate != null) {
             binding.projectDuplicate.setOnClickListener(v -> {
                 projectOptionsBSD.dismiss();
                 new MaterialAlertDialogBuilder(activity)
                         .setTitle("Duplicate project")
-                        .setMessage("Create a backup copy of \"" + yB.c(projectMap, "my_ws_name") + "\"? You can restore it as a new project.")
+                        .setMessage("Create a copy of \"" + yB.c(projectMap, "my_ws_name") + "\"? You can restore it as a new project from the top Restore action.")
                         .setPositiveButton("Duplicate", (d, w) -> duplicateProject(projectMap))
                         .setNegativeButton("Cancel", null)
                         .show();
             });
         }
 
-        // Part 1: Project notes
         if (binding.projectNotes != null) {
             binding.projectNotes.setOnClickListener(v -> {
                 projectOptionsBSD.dismiss();
                 showProjectNotesDialog(projectMap);
+            });
+        }
+
+        if (binding.projectShare != null) {
+            binding.projectShare.setOnClickListener(v -> {
+                projectOptionsBSD.dismiss();
+                shareProjectInfo(projectMap);
             });
         }
 
