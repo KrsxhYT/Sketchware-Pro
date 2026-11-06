@@ -5,14 +5,18 @@ import static pro.sketchware.utility.ThemeUtils.isDarkThemeEnabled;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.textfield.TextInputEditText;
 
 import a.a.a.Rs;
 import a.a.a.Ts;
@@ -25,6 +29,7 @@ public class PaletteBlock extends LinearLayout {
     public float f = 0.0F;
     private PaletteBlockBinding binding;
     private Context context;
+    private String currentQuery = "";
 
     public PaletteBlock(Context context) {
         super(context);
@@ -40,6 +45,74 @@ public class PaletteBlock extends LinearLayout {
         this.context = context;
         binding = PaletteBlockBinding.inflate(LayoutInflater.from(context), this, true);
         f = wB.a(context, 1.0F);
+
+        // Part 2: live block search
+        try {
+            TextInputEditText search = findViewById(R.id.et_block_search);
+            if (search != null) {
+                search.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        currentQuery = s != null ? s.toString() : "";
+                        filterBlocks(currentQuery);
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                    }
+                });
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void filterBlocks(String query) {
+        String q = query.trim().toLowerCase();
+        ViewGroup builder = binding.blockBuilder;
+        if (builder == null) return;
+
+        for (int i = 0; i < builder.getChildCount(); i++) {
+            View child = builder.getChildAt(i);
+            if (q.isEmpty()) {
+                child.setVisibility(View.VISIBLE);
+                continue;
+            }
+            String label = extractLabel(child);
+            // spacer views have empty label — hide when searching
+            if (label.isEmpty() && !(child instanceof TextView) && !(child instanceof MaterialCardView) && !(child instanceof Ts) && !(child instanceof Rs)) {
+                child.setVisibility(View.GONE);
+                continue;
+            }
+            child.setVisibility(label.toLowerCase().contains(q) ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    private String extractLabel(View view) {
+        CharSequence cd = view.getContentDescription();
+        if (cd != null && cd.length() > 0) return cd.toString();
+
+        if (view instanceof TextView) {
+            CharSequence t = ((TextView) view).getText();
+            return t != null ? t.toString() : "";
+        }
+        if (view instanceof ViewGroup) {
+            ViewGroup vg = (ViewGroup) view;
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < vg.getChildCount(); i++) {
+                View c = vg.getChildAt(i);
+                if (c instanceof TextView) {
+                    CharSequence t = ((TextView) c).getText();
+                    if (t != null) sb.append(t).append(' ');
+                }
+            }
+            if (sb.length() > 0) return sb.toString().trim();
+        }
+        Object tag = view.getTag();
+        return tag != null ? tag.toString() : "";
     }
 
     public Ts a(String var1, String var2, String var3) {
@@ -50,6 +123,7 @@ public class PaletteBlock extends LinearLayout {
         blockView.setContentDescription(generateContentDescription(var3));
         blockView.setBlockType(1);
         binding.blockBuilder.addView(blockView);
+        if (!currentQuery.isEmpty()) filterBlocks(currentQuery);
         return blockView;
     }
 
@@ -61,6 +135,7 @@ public class PaletteBlock extends LinearLayout {
         blockView.setContentDescription(generateContentDescription(var4));
         blockView.setBlockType(1);
         binding.blockBuilder.addView(blockView);
+        if (!currentQuery.isEmpty()) filterBlocks(currentQuery);
         return blockView;
     }
 
@@ -125,9 +200,6 @@ public class PaletteBlock extends LinearLayout {
         for (int i = 1; i < name.length(); i++) {
             char currentChar = name.charAt(i);
             if (Character.isUpperCase(currentChar)) {
-                // Check if previous char is not already a space (for acronyms like "HTTPExample")
-                // and if the current char is not part of an acronym (e.g. the TTP in HTTP)
-                // For simplicity here, just add a space before any uppercase unless it's followed by lowercase.
                 if (i + 1 < name.length() && Character.isLowerCase(name.charAt(i + 1)) || Character.isLowerCase(name.charAt(i - 1))) {
                     result.append(' ');
                 }
