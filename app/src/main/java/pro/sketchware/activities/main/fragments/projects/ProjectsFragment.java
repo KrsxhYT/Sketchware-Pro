@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -35,6 +36,7 @@ import com.google.android.material.transition.MaterialFadeThrough;
 import pro.sketchware.utility.AnalyticsHelper;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -54,6 +56,17 @@ import pro.sketchware.databinding.SortProjectDialogBinding;
 import pro.sketchware.utility.UI;
 
 public class ProjectsFragment extends DA {
+    private static final String[] DAILY_TIPS = new String[]{
+            "Long-press a project for notes, duplicate, backup and more options.",
+            "Use the search bar in the View palette to quickly find widgets.",
+            "Pin your main project so it always stays at the top of the list.",
+            "Backup projects regularly before big changes.",
+            "Join Krsxh Telegram for tips and updates: t.me/KrsxhYT",
+            "Restore .swb backups from the Restore action at the top.",
+            "Sort projects by name or ID using the sort icon.",
+            "Custom icons make your projects easier to recognize."
+    };
+
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private final List<HashMap<String, Object>> projectsList = new ArrayList<>();
     private MyprojectsBinding binding;
@@ -143,7 +156,7 @@ public class ProjectsFragment extends DA {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null; // avoid memory leaks
+        binding = null;
     }
 
     @Override
@@ -160,11 +173,21 @@ public class ProjectsFragment extends DA {
         binding.myprojects.setAdapter(projectsAdapter);
         binding.myprojects.setHasFixedSize(true);
 
-        binding.myprojects.post(this::refreshProjectsList); // wait for RecyclerView to be ready
+        binding.myprojects.post(this::refreshProjectsList);
         UI.addSystemWindowInsetToPadding(binding.specialActionContainer, true, false, true, false);
         UI.addSystemWindowInsetToPadding(binding.loadingContainer, true, false, true, true);
         UI.addSystemWindowInsetToPadding(binding.titleContainer, true, false, true, false);
         UI.addSystemWindowInsetToPadding(binding.myprojects, true, false, true, true);
+
+        // Daily tip (rotates by day of year)
+        try {
+            TextView tipText = binding.getRoot().findViewById(R.id.daily_tip_text);
+            if (tipText != null) {
+                int day = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
+                tipText.setText(DAILY_TIPS[day % DAILY_TIPS.length]);
+            }
+        } catch (Exception ignored) {
+        }
 
         binding.nestedScroll.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
             if (scrollY > oldScrollY) {
@@ -222,13 +245,11 @@ public class ProjectsFragment extends DA {
     }
 
     public void refreshProjectsList() {
-        // Check if the fragment is still attached to the activity
         if (!isAdded()) return;
 
-        // Don't load project list without having permissions
         if (!c()) {
             if (binding.swipeRefresh.isRefreshing()) binding.swipeRefresh.setRefreshing(false);
-            ((MainActivity) requireActivity()).s(); // ask for permissions
+            ((MainActivity) requireActivity()).s();
             return;
         }
 
