@@ -4,20 +4,36 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:paddingHorizontal="20dp"
-    android:paddingTop="10dp">
+    android:paddingTop="10dp"
+    android:paddingBottom="4dp">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayout_search"
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
-        android:layout_marginTop="5dp"
         android:layout_height="wrap_content"
-        app:errorEnabled="true">
+        app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edittext_search_value"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout_search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Search..."
-            android:singleLine="true" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_margin="4dp"
+            app:boxBackgroundMode="none"
+            app:errorEnabled="true"
+            app:startIconDrawable="@drawable/ic_mtrl_search"
+            app:endIconMode="clear_text">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edittext_search_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Search categories..."
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1"
+                android:singleLine="true" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </com.google.android.material.card.MaterialCardView>
 </LinearLayout>
