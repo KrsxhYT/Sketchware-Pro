@@ -46,7 +46,7 @@ public class PaletteBlock extends LinearLayout {
         binding = PaletteBlockBinding.inflate(LayoutInflater.from(context), this, true);
         f = wB.a(context, 1.0F);
 
-        // Part 2: live block search
+        // Live block search
         try {
             TextInputEditText search = findViewById(R.id.et_block_search);
             if (search != null) {
@@ -68,6 +68,18 @@ public class PaletteBlock extends LinearLayout {
             }
         } catch (Exception ignored) {
         }
+
+        // Part 2: tap category search header → open category search dialog
+        try {
+            TextView searchHeader = findViewById(R.id.search_header);
+            PaletteSelector selector = findViewById(R.id.palette_selector);
+            if (searchHeader != null && selector != null) {
+                searchHeader.setClickable(true);
+                searchHeader.setFocusable(true);
+                searchHeader.setOnClickListener(v -> selector.showSearchDialog());
+            }
+        } catch (Exception ignored) {
+        }
     }
 
     private void filterBlocks(String query) {
@@ -82,8 +94,8 @@ public class PaletteBlock extends LinearLayout {
                 continue;
             }
             String label = extractLabel(child);
-            // spacer views have empty label — hide when searching
-            if (label.isEmpty() && !(child instanceof TextView) && !(child instanceof MaterialCardView) && !(child instanceof Ts) && !(child instanceof Rs)) {
+            if (label.isEmpty() && !(child instanceof TextView) && !(child instanceof MaterialCardView)
+                    && !(child instanceof Ts) && !(child instanceof Rs)) {
                 child.setVisibility(View.GONE);
                 continue;
             }
